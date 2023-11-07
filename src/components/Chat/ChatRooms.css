@@ -27,9 +27,9 @@ h3 {
   padding: 10px;
   border: 2px solid #480a0a;
   border-radius: 0px;
-  overflow-y: auto; /* Cambia a 'auto' para mostrar la barra de desplazamiento cuando sea necesario */
-  max-height: 400px; /* Establece una altura máxima para la caja de mensajes */
-  background-color: #302e2e;/* Establece una altura máxima para la lista de usuarios */
+  overflow-y: auto; 
+  max-height: 400px; 
+  background-color: #302e2e;
 }
 .conversation-container {
   flex: 2.7;
@@ -47,8 +47,8 @@ h3 {
   padding: 10px;
   border: 2px solid #480a0a;
   border-radius: 0px;
-  overflow-y: auto; /* Cambia a 'auto' para mostrar la barra de desplazamiento cuando sea necesario */
-  max-height: 400px; /* Establece una altura máxima para la caja de mensajes */
+  overflow-y: auto;
+  max-height: 400px; 
   background-color: #ffffff;
 }
 
