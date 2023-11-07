@@ -9,17 +9,18 @@ import "../Chat/ChatRooms.css";
 import io from "socket.io-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getRandomIcon } from "./icons";
-const socket = io("https://chatwebapp-p1px.onrender.com");
 
+const socket = io("https://chatwebapp-p1px.onrender.com");
 const ChatRoom = () => {
   const dispatch = useDispatch();
   const personalChats = useSelector((state) => state.personalChats);
   const users = useSelector((state) => state.users);
   const currentUser = useSelector((state) => state.currentUser);
   const [message, setMessage] = useState("");
+  const [isTyping, setIsTyping] = useState({ user: "", typing: false });
   const [userIcons, setUserIcons] = useState({});
-  const [isTyping, setIsTyping] = useState(false); // Nuevo estado para el indicador de escritura
   const messagesEndRef = useRef(null);
+  let typingTimeout;
 
   useEffect(() => {
     if (currentUser) {
@@ -42,12 +43,16 @@ const ChatRoom = () => {
     setUserIcons(storedUserIcons);
   }, []);
 
+  const handleTyping = (typing) => {
+    setIsTyping({ user: currentUser, typing });
+    socket.emit("typing", { user: currentUser, typing });
+  };
+
   const handleSendMessage = () => {
     if (currentUser && message) {
       dispatch(createPersonalChat(message, currentUser));
       socket.emit("chat message", message);
       setMessage("");
-      setIsTyping(false); // Cuando se envía un mensaje, el usuario deja de escribir
       scrollToBottom();
     }
   };
@@ -79,16 +84,6 @@ const ChatRoom = () => {
     }
   };
 
-  const handleTyping = () => {
-    // Cuando el usuario comienza a escribir, establece isTyping en true
-    setIsTyping(true);
-
-    // Establece un temporizador para indicar que el usuario dejó de escribir después de un cierto tiempo
-    setTimeout(() => {
-      setIsTyping(false);
-    }, 1000); // Por ejemplo, 1 segundo
-  };
-
   return (
     <div className="chat-room-container">
       <div className="user-list">
@@ -102,6 +97,7 @@ const ChatRoom = () => {
           ))}
         </ul>
       </div>
+
       <div className="conversation-container">
         <div className="messages" ref={messagesEndRef}>
           {personalChats.map((chat, index) => (
@@ -118,31 +114,29 @@ const ChatRoom = () => {
             </div>
           ))}
         </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-        >
+
+        <h1 className="renderty">
+          {isTyping.typing && (
+            <div className="is-typing">{`${isTyping.user} está escribiendo un mensaje...`}</div>
+          )}
+        </h1>
+
+        <form onSubmit={(e) => e.preventDefault()}>
           <div className="message-input-container">
             <input
               type="text"
-              placeholder={
-                isTyping
-                  ? `${currentUser} está escribiendo...`
-                  : "Escribe un mensaje..."
-              }
+              placeholder="Escribe un mensaje..."
               value={message}
-              onChange={(e) => {
-                setMessage(e.target.value);
-                handleTyping();
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key !== "Enter") {
+                  handleTyping(true);
+                  clearTimeout(typingTimeout);
+                  typingTimeout = setTimeout(() => handleTyping(false), 6000);
+                }
               }}
             />
-            <button
-              className="send-button"
-              onClick={handleSendMessage}
-              disabled={isTyping}
-            >
+            <button className="send-button" onClick={handleSendMessage}>
               Enviar
             </button>
           </div>
@@ -153,8 +147,6 @@ const ChatRoom = () => {
 };
 
 export default ChatRoom;
-
-
 
 
 // import { useState, useEffect, useRef } from "react";
@@ -169,7 +161,6 @@ export default ChatRoom;
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { getRandomIcon } from "./icons";
 // const socket = io("https://chatwebapp-p1px.onrender.com");
-
 // const ChatRoom = () => {
 //   const dispatch = useDispatch();
 //   const personalChats = useSelector((state) => state.personalChats);
@@ -186,7 +177,6 @@ export default ChatRoom;
 //       dispatch(getAllUsers());
 //     }
 //   }, [currentUser, dispatch]);
-
 //   // Efecto para escuchar nuevos mensajes desde el servidor
 //   useEffect(() => {
 //     socket.on("chat message", (newMessage) => {

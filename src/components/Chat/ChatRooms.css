@@ -43,15 +43,20 @@ h3 {
   color: #888787;
 }
 .messages {
-  flex: 3;
+  flex: 3 !important;
   padding: 10px;
   border: 2px solid #480a0a;
   border-radius: 0px;
   overflow-y:scroll;
   scroll-snap-align: end;
   
-  max-height: 400px; 
+  max-height: 400px !important;  
   background-color: #ffffff;
+}
+
+.renderty {
+  color: black;
+  font-size: 10px;
 }
 
 .message {
