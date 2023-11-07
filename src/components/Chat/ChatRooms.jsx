@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  createPersonalChat,
-  getPersonalChats,
-  getAllUsers,
-} from "../Redux/actions";
-import "../Chat/ChatRooms.css";
-import io from "socket.io-client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getRandomIcon } from "./icons";
 
-const socket = io("https://chatwebapp-p1px.onrender.com");
+ import { useState, useEffect, useRef } from "react";
+ import { useSelector, useDispatch } from "react-redux";
+ import {
+   createPersonalChat,
+   getPersonalChats,
+   getAllUsers,
+ } from "../Redux/actions";
+ import "../Chat/ChatRooms.css";
+ import io from "socket.io-client";
+ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+ import { getRandomIcon } from "./icons";
+ const socket = io("https://chatwebapp-p1px.onrender.com");
+
 
 const ChatRoom = () => {
   const dispatch = useDispatch();
@@ -35,6 +36,7 @@ const ChatRoom = () => {
       // Realiza una actualización de los chats si es necesario
       if (currentUser) {
         dispatch(getPersonalChats(currentUser));
+        scrollToBottom();
       }
     });
   }, [currentUser, dispatch]);
@@ -48,18 +50,28 @@ const ChatRoom = () => {
   const handleSendMessage = () => {
     if (currentUser && message) {
       dispatch(createPersonalChat(message, currentUser));
-      // Emitir el mensaje al servidor
       socket.emit("chat message", message);
       setMessage("");
+      scrollToBottom();
     }
   };
-
-  // Efecto para desplazarse al final de la lista de mensajes
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      const messagesContainer = document.querySelector(".messages");
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
     }
   }, [personalChats]);
+  
+
+  // Función para desplazar el scroll al fondo
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  };
 
   const getUserIcon = (userName) => {
     if (userIcons[userName]) {
@@ -86,18 +98,20 @@ const ChatRoom = () => {
         </ul>
       </div>
       <div className="conversation-container">
-        <div className="messages">
+        <div className="messages" ref={messagesEndRef}>
           {personalChats.map((chat, index) => (
             <div key={index} className="message">
               <span className="sender">
-                <FontAwesomeIcon icon={getUserIcon(chat.userNameSend)} size="lg" />
+                <FontAwesomeIcon
+                  icon={getUserIcon(chat.userNameSend)}
+                  size="lg"
+                />
                 {chat.userNameSend}:
               </span>
               <span className="message-text">{chat.message}</span>
               <span className="createdAt">{chat.createdAt}</span>
             </div>
           ))}
-          <div ref={messagesEndRef}></div>
         </div>
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="message-input-container">
@@ -117,7 +131,9 @@ const ChatRoom = () => {
   );
 };
 
-export default ChatRoom;
+
+export default ChatRoom 
+
 
 
 
@@ -133,7 +149,7 @@ export default ChatRoom;
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { getRandomIcon } from "./icons";
 
-// const socket = io("http://localhost:3001/");
+// const socket = io("https://chatwebapp-p1px.onrender.com");
 
 // const ChatRoom = () => {
 //   const dispatch = useDispatch();
@@ -154,9 +170,9 @@ export default ChatRoom;
 
 //   // Efecto para escuchar nuevos mensajes desde el servidor
 //   useEffect(() => {
-//     socket.on("newMessage", (newMessage) => {
+//     socket.on("chat message", (newMessage) => {
 //       // Realiza una actualización de los chats si es necesario
-//       if (currentUser && newMessage.sender !== currentUser) {
+//       if (currentUser) {
 //         dispatch(getPersonalChats(currentUser));
 //       }
 //     });
@@ -171,7 +187,8 @@ export default ChatRoom;
 //   const handleSendMessage = () => {
 //     if (currentUser && message) {
 //       dispatch(createPersonalChat(message, currentUser));
-//       socket.emit("sendMessage", { message, sender: currentUser });
+//       // Emitir el mensaje al servidor
+//       socket.emit("chat message", message);
 //       setMessage("");
 //     }
 //   };
@@ -212,7 +229,10 @@ export default ChatRoom;
 //           {personalChats.map((chat, index) => (
 //             <div key={index} className="message">
 //               <span className="sender">
-//                 <FontAwesomeIcon icon={getUserIcon(chat.userNameSend)} size="lg" />
+//                 <FontAwesomeIcon
+//                   icon={getUserIcon(chat.userNameSend)}
+//                   size="lg"
+//                 />
 //                 {chat.userNameSend}:
 //               </span>
 //               <span className="message-text">{chat.message}</span>
