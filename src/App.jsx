@@ -1,13 +1,26 @@
 import { Routes, Route } from "react-router-dom";
-
 import ChatRoom from "./components/Chat/ChatRooms";
 import Login from "./components/Chat/Login";
-import { useSelector } from "react-redux"; // Importa useSelector para obtener currentUser
-
+import { useSelector } from "react-redux";
+import { Profiler } from "react";
+import "bootstrap/dist/css/bootstrap.css";
 
 function App() {
-  // Obtiene el currentUser desde Redux
   const currentUser = useSelector((state) => state.currentUser);
+
+  const callback = (
+    id,
+    phase,
+    actualDuration,
+    baseDuration,
+    startTime,
+    commitTime,
+    interactions
+  ) => {
+    console.log(`ID: ${id}, Phase: ${phase}, Duration: ${actualDuration},
+    Base Duration: ${baseDuration}, Start Time: ${startTime}, Commit Time: ${commitTime}
+    Interactions: ${interactions}`);
+  };
 
   return (
     <div>
@@ -15,11 +28,15 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Login />} />
-        
-        
-        {/* Pasa currentUser como prop al componente ChatRoom */}
-        <Route path="/chat" element={<ChatRoom currentUser={currentUser} />} />
-        
+
+        <Route
+          path="/chat"
+          element={
+            <Profiler id="myProfiler" onRender={callback}>
+              <ChatRoom currentUser={currentUser} />
+            </Profiler>
+          }
+        />
       </Routes>
     </div>
   );
