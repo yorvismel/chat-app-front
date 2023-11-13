@@ -1,54 +1,75 @@
+// reducer.js
 import {
-  CREATE_PERSONAL_CHAT_SUCCESS,
-  CREATE_PERSONAL_CHAT_FAILURE,
-  GET_PERSONAL_CHATS_SUCCESS,
-  GET_PERSONAL_CHATS_FAILURE,
-  CREATE_USER_SUCCESS,
-  CREATE_USER_FAILURE,
-  GET_ALL_USERS_SUCCESS,
-  GET_ALL_USERS_FAILURE,
+  SEND_MESSAGE,
+  FETCH_CHATS_SUCCESS,
+  FETCH_CHATS_FAILURE,
+  ADD_USER,
+  FETCH_USERS_SUCCESS,
+  FETCH_USERS_FAILURE,
+  ADD_USER_FAILURE,
+  SEND_MESSAGE_FAILURE,
 } from "./action-types";
 
 const initialState = {
-  personalChats: [],
+  chats: [],
+  loading: false,
+  error: null,
   users: [],
   currentUser: "",
+  loadingUsers: "",
+  errorUsers: null,
 };
 
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
-    case CREATE_PERSONAL_CHAT_SUCCESS:
+    case SEND_MESSAGE:
       return {
         ...state,
-        personalChats: [...state.personalChats, action.payload],
+        chats: [...state.chats, action.payload],
       };
-    case CREATE_PERSONAL_CHAT_FAILURE:
-      return state;
-
-    case GET_PERSONAL_CHATS_SUCCESS:
+    case SEND_MESSAGE_FAILURE:
       return {
         ...state,
-        personalChats:[...state.personalChats, ...action.payload],
+        error: action.payload,
       };
-    case GET_PERSONAL_CHATS_FAILURE:
-      return state;
-
-    case CREATE_USER_SUCCESS:
+    case FETCH_CHATS_SUCCESS:
+      return {
+        ...state,
+        chats: action.payload,
+        loading: false,
+        error: null,
+      };
+    case FETCH_CHATS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: "Error al recuperar los chats.",
+      };
+    case ADD_USER:
       return {
         ...state,
         currentUser: action.payload.userName,
       };
-    case CREATE_USER_FAILURE:
-      return state;
+    // En tu reducer.js
 
-    case GET_ALL_USERS_SUCCESS:
+    case ADD_USER_FAILURE:
+      return {
+        ...state,
+        errorUsers: action.payload,
+      };
+
+    case FETCH_USERS_SUCCESS:
       return {
         ...state,
         users: action.payload,
       };
-    case GET_ALL_USERS_FAILURE:
-      return state;
-
+    case FETCH_USERS_FAILURE:
+      return {
+        ...state,
+        loadingUsers: false,
+        errorUsers: "Error al recuperar los usuarios.",
+        users: [],
+      };
     default:
       return state;
   }

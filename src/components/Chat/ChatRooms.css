@@ -1,5 +1,3 @@
-/* ChatRoomsStyles.css */
-
 body {
   font-family: "Arial", sans-serif;
   background-color: #f0f0f0;
@@ -19,24 +17,11 @@ h1 {
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  max-height: 560px;
+  max-height: 570px;
   border-left: 25px solid #e0e7f0; /* Borde a la izquierda */
   border-top: 25px solid #e0e7f0; /* Borde superior */
   border-bottom: 25px solid #e0e7f0; /* Borde inferior */
 }
-
-/* .user-list {
-  font-size: 10px;
-  
-  flex: 0.5;
-  color: antiquewhite;
-  padding: 10px;
-  border: 2px solid #480a0a;
-  border-radius: 0px;
-  overflow-y: auto; 
-  max-height: 400px; 
-  background-color: #302e2e;
-} */
 
 .user-list h3 {
   margin-bottom: 10px;
@@ -60,16 +45,48 @@ h1 {
   border-right: 25px solid #e0e7f0; /* Borde a la izquierda */
   border-top: 25px solid #e0e7f0; /* Borde superior */
   border-bottom: 25px solid #e0e7f0; /* Borde inferior */
+  border-left: 25px solid #e0e7f0;
 }
 
 .messages {
-  max-height: 400px;
+  height: 350px;
   overflow-y: auto;
   border-bottom: 1px solid #eee;
 }
 
-.message {
+/* .message {
   margin-bottom: 10px;
+  background-color: rgb(204, 62, 62);
+  
+  border-radius: 5%;
+  color: white;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+} */
+.message {
+  position: relative;
+  max-width: 30%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 1.25rem;
+  word-wrap: break-word;
+  overflow: hidden; /* Asegura que el contenido no se desborde */
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #9ecea4;
+  color: rgb(17, 16, 16);
+  margin-left: auto;
+}
+
+.other-message {
+  align-self: flex-start;
+  background-color: #dcdee3;
+  margin-right: auto;
 }
 
 .sender {
@@ -77,16 +94,20 @@ h1 {
 }
 
 .message-text {
-  margin-left: 5px;
+  margin-left: 10px;
 }
 
 .createdAt {
-  font-size: 12px;
+  display: flex;
+
+  font-size: 8px;
   color: #888;
+  margin-bottom: 1px;
+  justify-content: end;
 }
 
 .is-typing {
-  margin-top: 0px;
+  margin-top: 10px;
   font-style: italic;
   width: 500px; /* Establece el ancho fijo */
   height: 5px; /* Establece la altura fija */
@@ -107,18 +128,21 @@ h1 {
   font-size: 1.8em;
   margin-right: 10px;
   cursor: pointer;
-  margin-bottom: 0px; /* Puedes ajustar esto según tus necesidades */
+  margin-bottom: 25px; /* Puedes ajustar esto según tus necesidades */
   border: 1px;
   color: white;
 }
-.prueba {
-  min-width: 300px; /* Establece el ancho mínimo según tus preferencias */
-  min-height: 10px; /* Establece la altura mínima según tus preferencias */
-  border-bottom: 1px solid rgb(213, 207, 207);
-  display: flex;
-  flex-direction: column-reverse; /* Invierte la dirección del contenido */
-  padding-bottom: 5px; /* Espaciado adicional en la parte inferior */
-  overflow-y: auto; /* Agrega desplazamiento vertical si el contenido es demasiado grande */
+.welcome {
+  display: inline-block;
+
+  color: rgb(40, 63, 6);
+  font-weight: bold;
+  background-color: rgb(239, 233, 222);
+  margin-left: 30%;
+  border-radius: 5%;
+  font-style: italic;
+  font-stretch: expanded;
+  padding: 5px; /* Agrega un poco de espacio alrededor del texto */
 }
 
 /* Estilos específicos para EmojiPicker */
@@ -137,25 +161,164 @@ h1 {
   padding: 8px 15px;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 0px;
-  margin-right: 10px;
+  margin-bottom: 25px;
+  margin-right: 20px;
 }
 
 .send-button:hover {
   background-color: #0056b3;
 }
 .renderty {
-  color: black;
+  color: #000000;
   font-size: 10px;
 }
 
+.prueba {
+  min-width: 300px; /* Establece el ancho mínimo según tus preferencias */
+  min-height: 20px; /* Establece la altura mínima según tus preferencias */
+  /* border-bottom: 1px solid rgb(213, 207, 207); */
+  display: flex;
+  flex-direction: column-reverse; /* Invierte la dirección del contenido */
+  padding-bottom: 5px; /* Espaciado adicional en la parte inferior */
+  background-color: transparent;
+}
+
 /* Responsividad */
-@media (max-width: 768px) {
+@media (max-width: 932px) {
+  body {
+    background-image: url("../../assets/pixelada.jpg");
+    background-repeat: no-repeat;
+
+    background-attachment: fixed;
+    background-position: center center;
+  }
   .container {
     margin-top: 0;
   }
-  .user-list,
+
   .conversation-container {
     margin-bottom: 20px;
+    max-width: 30px;
+
+    background-color: #f0f2f5;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-right: 10px solid #e0e7f0; /* Borde a la izquierda */
+    border-top: 10px solid #e0e7f0; /* Borde superior */
+    border-bottom: 10px solid #e0e7f0; /* Borde inferior */
+    border-left: 10px solid #e0e7f0;
+  }
+
+  .message {
+    position: relative;
+    max-width: 70%;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 1.25rem;
+    word-wrap: break-word;
+    overflow: hidden; /* Asegura que el contenido no se desborde */
+  }
+
+  .user-message {
+    align-self: flex-end;
+    background-color: #9ecea4;
+    color: rgb(17, 16, 16);
+    margin-left: auto;
+  }
+
+  .other-message {
+    align-self: flex-start;
+    background-color: #dcdee3;
+    margin-right: auto;
+  }
+  .prueba {
+    margin-bottom: 10px;
+  }
+  .renderty {
+    color: #000000;
+    font-size: 15px;
+    text-align: start;
+  }
+  h1 {
+    text-align: center;
+  }
+  .users-conect-list {
+    text-align: start;
+    color: #096d14;
+    font-size: 15px;
+    position: fixed;
+    margin-top: 0px;
+    margin-bottom: 1px;
+    margin-left: 0px;
+  }
+  .user-list {
+    float: left;
+    background-color: #f0f2f5;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    border-right: 10px solid #e0e7f0; /* Borde a la izquierda */
+    border-top: 10px solid #e0e7f0; /* Borde superior */
+    border-bottom: 10px solid #e0e7f0; /* Borde inferior */
+    border-left: 10px solid #e0e7f0;
+    margin-bottom: 10px;
+    max-height: 120px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    text-align: end;
+    margin-right: 100px;
+  }
+
+  li {
+    padding: 5px;
+    border-bottom: 1px solid #ba2323;
+  }
+
+  .emoji-button {
+    font-size: 1.8em;
+
+    cursor: pointer;
+
+    border: 1px;
+    color: white;
+    margin-bottom: 18px;
+    margin-right: 1px;
+  }
+
+  /* Estilos específicos para EmojiPicker */
+  .emoji-picker-react {
+    background-color: black;
+    position: absolute;
+    bottom: 10px;
+    right: 300px;
+    z-index: 9999;
+  }
+
+  .send-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 18px;
+    margin-right: 10px;
+  }
+
+  .send-button:hover {
+    background-color: #0056b3;
+  }
+
+  .welcome {
+    color: rgb(40, 63, 6);
+    font-weight: bold;
+    background-color: rgb(239, 233, 222);
+    font-style: italic;
+    font-stretch: expanded;
   }
 }

@@ -1,23 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  createPersonalChat,
-  getPersonalChats,
-  getAllUsers,
+  
+  fetchUsers,
+  sendMessage,
+  fetchChats,
 } from "../Redux/actions";
-import io from "socket.io-client";
+import { IoMdSend, IoMdEye, IoMdEyeOff } from "react-icons/io";
 import EmojiPicker from "emoji-picker-react";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-import "../Chat/ChatRooms.css"; 
+import io from "socket.io-client";
+import "../Chat/ChatRooms.css";
 
 // const socket = io("http://localhost:3001");
-const socket = io("https://chatwebapp-p1px.onrender.com");
+ const socket = io("https://chatwebapp-p1px.onrender.com")
 
 const ChatRoom = () => {
   const dispatch = useDispatch();
-  const personalChats = useSelector((state) => state.personalChats);
+  const personalChats = useSelector((state) => state.chats);
   const users = useSelector((state) => state.users);
   const currentUser = useSelector((state) => state.currentUser);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -26,53 +27,66 @@ const ChatRoom = () => {
   const [showUserList, setShowUserList] = useState(true);
   const messagesEndRef = useRef(null);
   const typingTimeout = useRef(null);
+  console.log("mensaje desde chatroom", message);
 
   useEffect(() => {
+    console.log("ChatRoom component mounted");
     if (currentUser) {
-      dispatch(getPersonalChats(currentUser));
-      dispatch(getAllUsers());
+      dispatch(fetchChats(currentUser));
+      dispatch(fetchUsers());
     }
   }, [currentUser, dispatch]);
 
   useEffect(() => {
     socket.on("chat message", (newMessage) => {
-      if (currentUser) {
-        dispatch(getPersonalChats(currentUser));
-        scrollToBottom();
-      }
+      console.log("Received new message:", newMessage);
+
+      console.log("Fetching chats after receiving a new message.");
+      dispatch(fetchChats(currentUser));
+      scrollToBottom();
     });
-  }, [currentUser, dispatch]);
+
+    return () => {
+      socket.off("chat message");
+      console.log("Personal Chats:", personalChats);
+    };
+  }, [currentUser, dispatch, personalChats]);
 
   useEffect(() => {
     socket.on("typing", (data) => {
+      console.log("Received typing event:", data);
       setIsTyping((prevIsTyping) => ({
         ...prevIsTyping,
         [data.user]: data.isTyping,
       }));
     });
+
+    return () => {
+      socket.off("typing");
+    };
   }, []);
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
+    console.log("Personal Chats after fetching:", personalChats);
+  }, [personalChats]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+      console.log("Scrolling to bottom at:", new Date().toLocaleTimeString());
+    }
+    console.log("Personal Chats after fetching:", personalChats);
   }, [personalChats]);
 
   const scrollToBottom = () => {
+    console.log("Before scrolling:", messagesEndRef.current.scrollTop);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
-  };
-
-  const handleSendMessage = () => {
-    if (currentUser && message) {
-      const emojiText = message;
-      dispatch(createPersonalChat(emojiText, currentUser));
-      socket.emit("chat message", emojiText);
-      setMessage("");
-      scrollToBottom();
-      handleTyping(false);
-    }
+    console.log("After scrolling:", messagesEndRef.current.scrollTop);
   };
 
   const handleTyping = useCallback(
@@ -98,14 +112,31 @@ const ChatRoom = () => {
     [currentUser]
   );
 
+  const handleSendMessage = async () => {
+    if (currentUser && message) {
+      const emojiText = message;
+      await dispatch(sendMessage(currentUser, emojiText));
+      socket.emit("chat message", { user: currentUser, message: emojiText });
+      setMessage("");
+      console.log("Before scrolling in handleSendMessage");
+      scrollToBottom();
+      console.log("After scrolling in handleSendMessage");
+      handleTyping(false);
+      console.log("personalChats después de sendMessage:", personalChats);
+    }
+  };
+
   return (
     <>
-      <h1 className="text-center mt-3 mb-1">Bienvenido {currentUser}</h1>
+      <h1 className="text-center mt-3 mb-1 welcome">
+        Bienvenid@: {currentUser}
+      </h1>
+
       <div className="container">
         <div className="row">
           {showUserList && (
             <div className="col-md-3 user-list">
-              <h3>Usuarios en la sala:</h3>
+              <h3 className="users-conect-list">Usuarios conectados:</h3>
               <ul>
                 {users.map((user) => (
                   <li key={user.id}>{user.userName}</li>
@@ -129,19 +160,40 @@ const ChatRoom = () => {
                   )
               )}
             </div>
-            <div className="messages" ref={messagesEndRef}>
-              {personalChats.map((chat, index) => (
-                <div key={index} className="message">
-                  <span className="sender">{chat.userNameSend}:</span>
-                  <span className="message-text">{chat.message}</span>
-                  <span className="createdAt">{chat.createdAt}</span>
-                </div>
-              ))}
+            <div className="text-end mt-3">
+              {showUserList ? (
+                <Link className="btn " onClick={() => setShowUserList(false)}>
+                  <IoMdEye />
+                </Link>
+              ) : (
+                <Link className="" onClick={() => setShowUserList(true)}>
+                  <IoMdEyeOff />
+                </Link>
+              )}
             </div>
+            <div className="messages" ref={messagesEndRef}>
+              {console.log("Personal Chats al principio:", personalChats)};
+              {personalChats.map((chat, index) => {
+                const isCurrentUser = chat.userNameSend === currentUser;
+                const messageClass = isCurrentUser
+                  ? "user-message"
+                  : "other-message";
+
+                return (
+                  <div key={index} className={`message ${messageClass}`}>
+                    <span className="sender">{chat.userNameSend}:</span>
+                    <span className="message-text">{chat.message}</span>
+                    <span className="createdAt">{chat.createdAt}</span>
+                  </div>
+                );
+              })}
+              {console.log("Personal Chats al final:", personalChats)}
+            </div>
+
             <form onSubmit={(e) => e.preventDefault()}>
               <div className="message-input-container">
                 <input
-                  type="link"
+                  type="text"
                   placeholder="Escribe un mensaje..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -177,28 +229,11 @@ const ChatRoom = () => {
                   className="btn btn-primary send-button"
                   onClick={handleSendMessage}
                 >
-                  Enviar
+                  <IoMdSend />
                 </button>
               </div>
             </form>
           </div>
-        </div>
-        <div className="text-center mt-3">
-          {showUserList ? (
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowUserList(false)}
-            >
-              Ocultar Lista de Usuarios
-            </button>
-          ) : (
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowUserList(true)}
-            >
-              Mostrar Lista de Usuarios
-            </button>
-          )}
         </div>
       </div>
     </>

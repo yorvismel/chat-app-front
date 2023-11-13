@@ -24,8 +24,6 @@ function App() {
 
   return (
     <div>
-      <h1>Chat de Usuarios</h1>
-
       <Routes>
         <Route path="/" element={<Login />} />
 

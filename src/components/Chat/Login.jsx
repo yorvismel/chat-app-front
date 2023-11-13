@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createUser, getPersonalChats, getAllUsers } from "../Redux/actions";
+import { addUser, fetchChats, fetchUsers } from "../Redux/actions";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import Loading from "../Loading/Loading";
@@ -11,17 +11,16 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLoadingChats, setIsLoadingChats] = useState(false);
   const [chatsLoaded, setChatsLoaded] = useState(false);
-  const currentUser = useSelector((state) => state.currentUser);
+  const users = useSelector((state) => state.users);
 
   const handleLogin = () => {
     if (userName) {
       setIsLoadingChats(true);
 
-      dispatch(createUser(userName));
+      dispatch(addUser(userName));
 
-      // Realiza las operaciones para obtener los chats desde la base de datos
-      dispatch(getAllUsers())
-        .then(() => dispatch(getPersonalChats(currentUser)))
+      dispatch(fetchUsers())
+        .then(() => dispatch(fetchChats(userName)))
         .then(() => {
           setIsLoadingChats(false);
           setChatsLoaded(true);
@@ -31,7 +30,6 @@ const Login = () => {
 
   useEffect(() => {
     if (chatsLoaded) {
-      // Cuando los chats se han cargado, navega a la página de chat.
       navigate("/chat");
     }
   }, [chatsLoaded, navigate]);
